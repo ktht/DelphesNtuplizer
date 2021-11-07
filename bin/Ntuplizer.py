@@ -265,6 +265,7 @@ class TreeProducer:
         i = 0
         for item in vertices:
             self.vtx_pt2[i] = item.SumPT2
+            self.vtx_ndf[i] = item.NDF
             self.vtx_x[i] = item.X   #Gamze
             self.vtx_y[i] = item.Y   #Gamze
             self.vtx_z[i] = item.Z   #Gamze
