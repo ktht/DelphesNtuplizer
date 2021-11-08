@@ -12,7 +12,7 @@ import argparse
 
 
 class TreeProducer:
-    def __init__(self, debug):
+    def __init__(self, pileup, debug):
 
          # flat tree branches
          self.debug = debug
@@ -20,12 +20,13 @@ class TreeProducer:
          self.t = ROOT.TTree( "Events","Events" )
          self.maxn = 9999
 
-         self.vtx_size         = array( 'i', [ 0 ] )
-         self.vtx_ndf          = array( 'i', self.maxn*[0] )
-         self.vtx_pt2          = array( 'f', self.maxn*[ 0. ] )
-         self.vtx_x            = array( 'f', self.maxn*[ 0. ] )
-         self.vtx_y            = array( 'f', self.maxn*[ 0. ] )
-         self.vtx_z            = array( 'f', self.maxn*[ 0. ] )
+         if pileup:
+             self.vtx_size         = array( 'i', [ 0 ] )
+             self.vtx_ndf          = array( 'i', self.maxn*[0] )
+             self.vtx_pt2          = array( 'f', self.maxn*[ 0. ] )
+             self.vtx_x            = array( 'f', self.maxn*[ 0. ] )
+             self.vtx_y            = array( 'f', self.maxn*[ 0. ] )
+             self.vtx_z            = array( 'f', self.maxn*[ 0. ] )
 
          ## main MC weight
          self.evt_nr            = array( 'l', [ 0 ] )
@@ -134,8 +135,9 @@ class TreeProducer:
          self.jet_flavorAlgo   = array( 'i', self.maxn*[ 0 ] )
          self.jet_flavorPhys   = array( 'i', self.maxn*[ 0 ] )
 
-         self.rho_size         = array( 'i', [ 0 ] )
-         self.rho              = array( 'f', self.maxn*[ 0. ] )
+         if pileup:
+             self.rho_size         = array( 'i', [ 0 ] )
+             self.rho              = array( 'f', self.maxn*[ 0. ] )
 
          self.met_pt           = array( 'f', [ 0. ] )
          self.met_phi          = array( 'f', [ 0. ] )
@@ -158,12 +160,13 @@ class TreeProducer:
          self.t.Branch( "nLHEWeight", self.lheweight_size, "nLHEWeight/I")
          self.t.Branch( "LHEWeight", self. lheweight_val, "LHEWeight[nLHEWeight]/I")
 
-         self.t.Branch( "nVertex", self.vtx_size, "nVertex/I")
-         self.t.Branch( "Vertex_ndf", self.vtx_ndf, "Vertex_ndf[nVertex]/I")
-         self.t.Branch( "Vertex_pt2", self.vtx_pt2, "Vertex_pt2[nVertex]/F")
-         self.t.Branch( "Vertex_x", self.vtx_x, "Vertex_x[nVertex]/F")
-         self.t.Branch( "Vertex_y", self.vtx_y, "Vertex_y[nVertex]/F")
-         self.t.Branch( "Vertex_z", self.vtx_z, "Vertex_z[nVertex]/F")
+         if pileup:
+             self.t.Branch( "nVertex", self.vtx_size, "nVertex/I")
+             self.t.Branch( "Vertex_ndf", self.vtx_ndf, "Vertex_ndf[nVertex]/I")
+             self.t.Branch( "Vertex_pt2", self.vtx_pt2, "Vertex_pt2[nVertex]/F")
+             self.t.Branch( "Vertex_x", self.vtx_x, "Vertex_x[nVertex]/F")
+             self.t.Branch( "Vertex_y", self.vtx_y, "Vertex_y[nVertex]/F")
+             self.t.Branch( "Vertex_z", self.vtx_z, "Vertex_z[nVertex]/F")
 
          self.t.Branch( "nGenPart", self.genpart_size, "nGenPart/I")
          self.t.Branch( "GenPart_pid", self.genpart_pid, "GenPart_pid[nGenPart]/I")
@@ -254,8 +257,9 @@ class TreeProducer:
          self.t.Branch( "Jet_flavorAlgo", self.jet_flavorAlgo, "Jet_flavorAlgo[nJet]/I")
          self.t.Branch( "Jet_flavorPhys", self.jet_flavorPhys, "Jet_flavorPhys[nJet]/I")
 
-         self.t.Branch( "nRho", self.rho_size, "nRho/I")
-         self.t.Branch( "Rho", self.rho, "Rho[nRho]/F")
+         if pileup:
+             self.t.Branch( "nRho", self.rho_size, "nRho/I")
+             self.t.Branch( "Rho", self.rho, "Rho[nRho]/F")
 
          self.t.Branch( "MET_pt", self. met_pt, "MET_pt/F")
          self.t.Branch( "MET_phi", self.met_phi, "MET_phi/F")
@@ -402,7 +406,7 @@ class TreeProducer:
         self.muon_size[0] = i
 
     #___________________________________________
-    def processCHSJets(self, jets, rho):
+    def processCHSJets(self, jets):
 
         i = 0
         for item in jets:
@@ -430,13 +434,16 @@ class TreeProducer:
             i += 1
         self.jet_size[0] = i
 
-        j = 0
+    # ___________________________________________
+    def processRho(self, rho):
+
+        i = 0
         for item in rho:
             self.rho[i] = item.Rho
 
-            j += 1
+            i += 1
 
-        self.rho_size[0] = j
+        self.rho_size[0] = i
 
     #___________________________________________
     def processMissingET(self, met):
@@ -466,11 +473,13 @@ def main():
     except:
       pass
 
+    bool_type = lambda s: s.lower() in [ 'True', '1' ]
     parser = argparse.ArgumentParser()
     parser.add_argument ('-i', '--input', help='input Delphes file',  default='delphes.root')
     parser.add_argument ('-o', '--output', help='output flat tree',  default='tree.root')
     parser.add_argument ('-n', '--nev', help='number of events', type=int, default=-1)
     parser.add_argument ('-d', '--debug', help='debug flag',  action='store_true',  default=False)
+    parser.add_argument ('-p', '--pileup', help='input built with PU', type=bool_type, default=True)
 
     args = parser.parse_args()
 
@@ -478,6 +487,7 @@ def main():
     outputFile = args.output
     nevents = args.nev
     debug = args.debug
+    pileup = args.pileup
 
     chain = ROOT.TChain("Delphes")
     chain.Add(inputFile)
@@ -492,7 +502,8 @@ def main():
 
     branchEvent           = treeReader.UseBranch('Event')   
     branchWeight          = treeReader.UseBranch('Weight')   
-    branchVertex          = treeReader.UseBranch('Vertex')
+    if pileup:
+        branchVertex          = treeReader.UseBranch('Vertex')
     branchParticle        = treeReader.UseBranch('Particle') 
     branchGenJet          = treeReader.UseBranch('GenJet')   
     branchGenMissingET    = treeReader.UseBranch('GenMissingET')   
@@ -500,10 +511,11 @@ def main():
     branchElectron        = treeReader.UseBranch('Electron')
     branchMuon            = treeReader.UseBranch('Muon')
     branchCHSJet          = treeReader.UseBranch('Jet')
-    branchPuppiMissingET  = treeReader.UseBranch('MissingET')
-    branchRho             = treeReader.UseBranch('Rho')
+    branchMissingET       = treeReader.UseBranch('MissingET')
+    if pileup:
+        branchRho             = treeReader.UseBranch('Rho')
 
-    treeProducer = TreeProducer(debug)
+    treeProducer = TreeProducer(pileup, debug)
 
     if nevents > 0:
         numberOfEntries = nevents
@@ -518,15 +530,18 @@ def main():
             print(' ... processed {} events ...'.format(entry+1))
 
         treeProducer.processEvent(branchEvent, branchWeight)
-        treeProducer.processVertices(branchVertex)
+        if pileup:
+            treeProducer.processVertices(branchVertex)
         treeProducer.processGenParticles(branchParticle)
         treeProducer.processGenJets(branchGenJet)
         treeProducer.processGenMissingET(branchGenMissingET)
         treeProducer.processElectrons(branchElectron)
         treeProducer.processMuons(branchMuon)
         treeProducer.processPhotons(branchPhoton)
-        treeProducer.processMissingET(branchPuppiMissingET)
-        treeProducer.processCHSJets(branchCHSJet, branchRho)
+        treeProducer.processMissingET(branchMissingET)
+        treeProducer.processCHSJets(branchCHSJet)
+        if pileup:
+            treeProducer.processRho(branchRho)
 
         ## fill tree 
         treeProducer.fill()
