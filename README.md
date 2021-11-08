@@ -29,7 +29,7 @@ For setting up this particular repository, run the following:
 
 ```bash
 cd DelphesNtuplizer # where you cloned this repository
-source set_env.sh
+source ./set_env.sh
 ```
 
 That's it!
