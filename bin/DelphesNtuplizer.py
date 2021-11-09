@@ -31,6 +31,8 @@ class TreeProducer:
 
          ## main MC weight
          self.evt_nr            = array( 'l', [ 0 ] )
+         self.lumi_nr           = array( 'i', [ 0 ] )
+         self.run_nr            = array( 'i', [ 0 ] )
          self.genweight         = array( 'f', [ 0. ] )
          self.scale             = array( 'f', [ 0. ] )
          if not self.prune:
@@ -151,6 +153,8 @@ class TreeProducer:
 
          # declare tree branches
          self.t.Branch( "event", self.evt_nr, "event/L")
+         self.t.Branch( "luminosityBlock", self.lumi_nr, "luminosityBlock/I" )
+         self.t.Branch( "run", self.run_nr, "run/I" )
          self.t.Branch( "scale", self.scale, "scale/F")
          if not self.prune:
              self.t.Branch( "scalePDF", self.scalePDF, "scalePDF/F")
@@ -295,6 +299,8 @@ class TreeProducer:
 
         self.genweight[0] = event[0].Weight
         self.evt_nr[0]    = event[0].Number
+        self.lumi_nr[0]   = event[0].ProcessID
+        self.run_nr[0]    = 1
         self.scale[0]     = event[0].Scale
         if not self.prune:
             self.scalePDF[0]  = event[0].ScalePDF
@@ -306,8 +312,6 @@ class TreeProducer:
         self.id2[0]       = event[0].ID2
         self.alphaQED[0]  = event[0].AlphaQED
         self.alphaQCD[0]  = event[0].AlphaQCD
-        if not self.prune:
-            self.pid[0]       = event[0].ProcessID
 
         if not self.prune:
             for item in weights:
@@ -317,20 +321,29 @@ class TreeProducer:
 
 
     #___________________________________________
-    def shifIdx(self, idx, eliminate):
+    def shifIdx(self, idx, eliminate, is_dau):
         if idx < 0 or not eliminate:
             return idx
+        if is_dau and idx in eliminate:
+            return -1
         shift = len([ i for i in eliminate if i < idx ])
         assert(shift <= idx)
         return idx - shift
 
     def processGenParticles(self, particles):
+        mothers = []
+        if self.prune:
+            for idx, item in enumerate(particles):
+                if item.D1 >= 0 and idx not in mothers:
+                    mothers.append(idx)
+                if item.M1 >= 0 and item.M1 not in mothers:
+                    mothers.append(item.M1)
         eliminate = []
         if self.prune:
             for idx, item in enumerate(particles):
-                if item.D1 == -1 and item.D2 == -1 and ( # final state
+                if item.D1 == -1 and item.D2 == -1 and idx not in mothers and ( # final state
                     (item.M1 >= 0 and particles[item.M1].M1 < 0) or # straight from proton
-                    (item.Status != 1) or # unstable
+                    #(item.Status != 1) or # unstable
                     (abs(item.PID) not in [ 1, 2, 3, 4, 5, 11, 12, 13, 14, 15, 16 ]) # keep only leptons and quarks
                 ):
                     eliminate.append(idx)
@@ -344,10 +357,10 @@ class TreeProducer:
                 self.genpart_eta    [i] = item.Eta
                 self.genpart_phi    [i] = item.Phi
                 self.genpart_mass   [i] = item.Mass
-                self.genpart_m1     [i] = self.shifIdx(item.M1, eliminate)
-                #self.genpart_m2     [i] = self.shifIdx(item.M2, eliminate)
-                self.genpart_d1     [i] = self.shifIdx(item.D1, eliminate)
-                self.genpart_d2     [i] = self.shifIdx(item.D2, eliminate)
+                self.genpart_m1     [i] = self.shifIdx(item.M1, eliminate, False)
+                #self.genpart_m2     [i] = self.shifIdx(item.M2, eliminate, False)
+                self.genpart_d1     [i] = self.shifIdx(item.D1, eliminate, True)
+                self.genpart_d2     [i] = self.shifIdx(item.D2, eliminate, True)
                 i += 1
         self.genpart_size[0] = i
 
