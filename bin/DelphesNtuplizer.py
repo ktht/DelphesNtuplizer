@@ -33,16 +33,18 @@ class TreeProducer:
          self.evt_nr            = array( 'l', [ 0 ] )
          self.genweight         = array( 'f', [ 0. ] )
          self.scale             = array( 'f', [ 0. ] )
-         self.scalePDF          = array( 'f', [ 0. ] )
-         self.pdf1              = array( 'f', [ 0. ] )
-         self.pdf2              = array( 'f', [ 0. ] )
+         if not self.prune:
+             self.scalePDF          = array( 'f', [ 0. ] )
+             self.pdf1              = array( 'f', [ 0. ] )
+             self.pdf2              = array( 'f', [ 0. ] )
          self.x1                = array( 'f', [ 0. ] )
          self.x2                = array( 'f', [ 0. ] )
          self.id1               = array( 'i', [ 0 ] )
          self.id2               = array( 'i', [ 0 ] )
          self.alphaQED          = array( 'f', [ 0. ] )
          self.alphaQCD          = array( 'f', [ 0. ] )
-         self.pid               = array( 'i', [ 0 ] )
+         if not self.prune:
+            self.pid               = array( 'i', [ 0 ] )
          
          ## variation event weights (from "LHEEventProduct")
          if not self.prune:
@@ -57,7 +59,7 @@ class TreeProducer:
          self.genpart_phi      = array( 'f', self.maxn*[ 0. ] )
          self.genpart_mass     = array( 'f', self.maxn*[ 0. ] )
          self.genpart_m1       = array( 'i', self.maxn*[ 0 ] )
-         self.genpart_m2       = array( 'i', self.maxn*[ 0 ] )
+         #self.genpart_m2       = array( 'i', self.maxn*[ 0 ] )
          self.genpart_d1       = array( 'i', self.maxn*[ 0 ] )
          self.genpart_d2       = array( 'i', self.maxn*[ 0 ] )
 
@@ -66,13 +68,14 @@ class TreeProducer:
          self.genjet_eta       = array( 'f', self.maxn*[ 0. ] )
          self.genjet_phi       = array( 'f', self.maxn*[ 0. ] )
          self.genjet_mass      = array( 'f', self.maxn*[ 0. ] )
-         self.genjet_deltaEta  = array( 'f', self.maxn*[ 0. ] )
-         self.genjet_deltaPhi  = array( 'f', self.maxn*[ 0. ] )
-         self.genjet_charge    = array( 'i', self.maxn*[ 0 ] )
-         self.genjet_nCharged  = array( 'i', self.maxn*[ 0 ] )
-         self.genjet_nNeutral  = array( 'i', self.maxn*[ 0 ] )
-         self.genjet_nef       = array( 'f', self.maxn*[ 0. ] )
-         self.genjet_cef       = array( 'f', self.maxn*[ 0. ] )
+         if not self.prune:
+             self.genjet_deltaEta  = array( 'f', self.maxn*[ 0. ] )
+             self.genjet_deltaPhi  = array( 'f', self.maxn*[ 0. ] )
+             self.genjet_charge    = array( 'i', self.maxn*[ 0 ] )
+             self.genjet_nCharged  = array( 'i', self.maxn*[ 0 ] )
+             self.genjet_nNeutral  = array( 'i', self.maxn*[ 0 ] )
+             self.genjet_nef       = array( 'f', self.maxn*[ 0. ] )
+             self.genjet_cef       = array( 'f', self.maxn*[ 0. ] )
 
          self.genmet_pt        = array( 'f', [ 0. ] )
          self.genmet_phi       = array( 'f', [ 0. ] )
@@ -123,14 +126,15 @@ class TreeProducer:
          self.jet_eta          = array( 'f', self.maxn*[ 0. ] )
          self.jet_phi          = array( 'f', self.maxn*[ 0. ] )
          self.jet_mass         = array( 'f', self.maxn*[ 0. ] )
-         self.jet_deltaEta     = array( 'f', self.maxn*[ 0. ] )
-         self.jet_deltaPhi     = array( 'f', self.maxn*[ 0. ] )
-         self.jet_charge       = array( 'i', self.maxn*[ 0 ] )
-         self.jet_hoe          = array( 'f', self.maxn*[ 0. ] )
-         self.jet_nCharged     = array( 'i', self.maxn*[ 0 ] )
-         self.jet_nNeutral     = array( 'i', self.maxn*[ 0 ] )
-         self.jet_nef          = array( 'f', self.maxn*[ 0. ] )
-         self.jet_cef          = array( 'f', self.maxn*[ 0. ] )
+         if not self.prune:
+             self.jet_deltaEta     = array( 'f', self.maxn*[ 0. ] )
+             self.jet_deltaPhi     = array( 'f', self.maxn*[ 0. ] )
+             self.jet_charge       = array( 'i', self.maxn*[ 0 ] )
+             self.jet_hoe          = array( 'f', self.maxn*[ 0. ] )
+             self.jet_nCharged     = array( 'i', self.maxn*[ 0 ] )
+             self.jet_nNeutral     = array( 'i', self.maxn*[ 0 ] )
+             self.jet_nef          = array( 'f', self.maxn*[ 0. ] )
+             self.jet_cef          = array( 'f', self.maxn*[ 0. ] )
          self.jet_btag         = array( 'i', self.maxn*[ 0 ] )
          self.jet_btagAlgo     = array( 'i', self.maxn*[ 0 ] )
          self.jet_btagPhys     = array( 'i', self.maxn*[ 0 ] )
@@ -148,16 +152,18 @@ class TreeProducer:
          # declare tree branches
          self.t.Branch( "event", self.evt_nr, "event/L")
          self.t.Branch( "scale", self.scale, "scale/F")
-         self.t.Branch( "scalePDF", self.scalePDF, "scalePDF/F")
-         self.t.Branch( "pdf1", self.pdf1, "pdf1/F")
-         self.t.Branch( "pdf2", self.pdf2, "pdf2/F")
+         if not self.prune:
+             self.t.Branch( "scalePDF", self.scalePDF, "scalePDF/F")
+             self.t.Branch( "pdf1", self.pdf1, "pdf1/F")
+             self.t.Branch( "pdf2", self.pdf2, "pdf2/F")
          self.t.Branch( "x1", self.x1, "x1/F")
          self.t.Branch( "x2", self.x2, "x2/F")
          self.t.Branch( "id1", self.id1, "id1/I")
          self.t.Branch( "id2", self.id2, "id2/I")
          self.t.Branch( "alphaQED", self.alphaQED, "alphaQED/F")
          self.t.Branch( "alphaQCD", self.alphaQCD, "alphaQCD/F")
-         self.t.Branch( "PID", self.pid, "PID/I")
+         if not self.prune:
+            self.t.Branch( "PID", self.pid, "PID/I")
          
          self.t.Branch( "genweight", self.genweight, "genweight/F")
          if not self.prune:
@@ -173,15 +179,14 @@ class TreeProducer:
              self.t.Branch( "Vertex_z", self.vtx_z, "Vertex_z[nVertex]/F")
 
          self.t.Branch( "nGenPart", self.genpart_size, "nGenPart/I")
-         self.t.Branch( "GenPart_pid", self.genpart_pid, "GenPart_pid[nGenPart]/I")
+         self.t.Branch( "GenPart_pdgId", self.genpart_pid, "GenPart_pdgId[nGenPart]/I")
          self.t.Branch( "GenPart_status", self.genpart_status, "GenPart_status[nGenPart]/I")
-         self.t.Branch( "GenPart_charge", self.genpart_status, "GenPart_charge[nGenPart]/I")
          self.t.Branch( "GenPart_pt", self.genpart_pt, "GenPart_pt[nGenPart]/F")
          self.t.Branch( "GenPart_eta", self.genpart_eta, "GenPart_eta[nGenPart]/F")
          self.t.Branch( "GenPart_phi", self.genpart_phi, "GenPart_phi[nGenPart]/F")
          self.t.Branch( "GenPart_mass", self.genpart_mass, "GenPart_mass[nGenPart]/F")
-         self.t.Branch( "GenPart_m1", self.genpart_m1, "genpart_m1[nGenPart]/I")
-         self.t.Branch( "GenPart_m2", self.genpart_m2, "GenPart_m2[nGenPart]/I")
+         self.t.Branch( "GenPart_genPartIdxMother", self.genpart_m1, "genpart_genPartIdxMother[nGenPart]/I")
+         #self.t.Branch( "GenPart_m2", self.genpart_m2, "GenPart_m2[nGenPart]/I")
          self.t.Branch( "GenPart_d1", self.genpart_d1, "GenPart_d1[nGenPart]/I")
          self.t.Branch( "GenPart_d2", self.genpart_d2, "GenPart_d2[nGenPart]/I")
 
@@ -190,13 +195,14 @@ class TreeProducer:
          self.t.Branch( "GenJet_eta", self.genjet_eta, "GenJet_eta[nGenJet]/F")
          self.t.Branch( "GenJet_phi", self.genjet_phi, "GenJet_phi[nGenJet]/F")
          self.t.Branch( "GenJet_mass", self.genjet_mass, "GenJet_mass[nGenJet]/F")
-         self.t.Branch( "GenJet_deltaEta", self.genjet_deltaEta, "GenJet_deltaEta[nGenJet]/F")
-         self.t.Branch( "GenJet_deltaPhi", self.genjet_deltaPhi, "GenJet_deltaPhi[nGenJet]/F")
-         self.t.Branch( "GenJet_charge", self.genjet_charge, "GenJet_charge[nGenJet]/I")
-         self.t.Branch( "GenJet_nCharged", self.genjet_nCharged, "GenJet_nCharged[nGenJet]/I")
-         self.t.Branch( "GenJet_nNeutral", self.genjet_nNeutral, "GenJet_nNeutral[nGenJet]/I")
-         self.t.Branch( "GenJet_nef", self.genjet_nef, "GenJet_nef[nGenJet]/F")
-         self.t.Branch( "GenJet_cef", self.genjet_cef, "GenJet_cef[nGenJet]/F")
+         if not self.prune:
+             self.t.Branch( "GenJet_deltaEta", self.genjet_deltaEta, "GenJet_deltaEta[nGenJet]/F")
+             self.t.Branch( "GenJet_deltaPhi", self.genjet_deltaPhi, "GenJet_deltaPhi[nGenJet]/F")
+             self.t.Branch( "GenJet_charge", self.genjet_charge, "GenJet_charge[nGenJet]/I")
+             self.t.Branch( "GenJet_nCharged", self.genjet_nCharged, "GenJet_nCharged[nGenJet]/I")
+             self.t.Branch( "GenJet_nNeutral", self.genjet_nNeutral, "GenJet_nNeutral[nGenJet]/I")
+             self.t.Branch( "GenJet_nef", self.genjet_nef, "GenJet_nef[nGenJet]/F")
+             self.t.Branch( "GenJet_cef", self.genjet_cef, "GenJet_cef[nGenJet]/F")
 
          self.t.Branch( "GenMET_pt", self.genmet_pt, "GenMET_pt/F")
          self.t.Branch( "GenMET_phi", self.genmet_phi, "GenMET_phi/F")
@@ -247,14 +253,15 @@ class TreeProducer:
          self.t.Branch( "Jet_eta", self.jet_eta, "Jet_eta[nJet]/F")
          self.t.Branch( "Jet_phi", self.jet_phi, "Jet_phi[nJet]/F")
          self.t.Branch( "Jet_mass", self.jet_mass, "Jet_mass[nJet]/F")
-         self.t.Branch( "Jet_deltaEta", self.jet_deltaEta, "Jet_deltaEta[nJet]/F")
-         self.t.Branch( "Jet_deltaPhi", self.jet_deltaPhi, "Jet_deltaPhi[nJet]/F")
-         self.t.Branch( "Jet_charge", self.jet_charge, "Jet_charge[nJet]/I")
-         self.t.Branch( "Jet_hoe", self.jet_hoe, "Jet_hoe[nJet]/F")
-         self.t.Branch( "Jet_nCharged", self.jet_nCharged, "Jet_nCharged[nJet]/I")
-         self.t.Branch( "Jet_nNeutral", self.jet_nNeutral, "Jet_nNeutral[nJet]/I")
-         self.t.Branch( "Jet_nef", self.jet_nef, "Jet_nef[nJet]/F")
-         self.t.Branch( "Jet_cef", self.jet_cef, "Jet_cef[nJet]/F")
+         if not self.prune:
+             self.t.Branch( "Jet_deltaEta", self.jet_deltaEta, "Jet_deltaEta[nJet]/F")
+             self.t.Branch( "Jet_deltaPhi", self.jet_deltaPhi, "Jet_deltaPhi[nJet]/F")
+             self.t.Branch( "Jet_charge", self.jet_charge, "Jet_charge[nJet]/I")
+             self.t.Branch( "Jet_hoe", self.jet_hoe, "Jet_hoe[nJet]/F")
+             self.t.Branch( "Jet_nCharged", self.jet_nCharged, "Jet_nCharged[nJet]/I")
+             self.t.Branch( "Jet_nNeutral", self.jet_nNeutral, "Jet_nNeutral[nJet]/I")
+             self.t.Branch( "Jet_nef", self.jet_nef, "Jet_nef[nJet]/F")
+             self.t.Branch( "Jet_cef", self.jet_cef, "Jet_cef[nJet]/F")
          self.t.Branch( "Jet_btag", self.jet_btag,"Jet_btag[nJet]/I")
          self.t.Branch( "Jet_btagAlgo", self.jet_btagAlgo, "Jet_btagAlgo[nJet]/I")
          self.t.Branch( "Jet_btagPhys", self.jet_btagPhys, "Jet_btagPhys[nJet]/I")
@@ -289,16 +296,18 @@ class TreeProducer:
         self.genweight[0] = event[0].Weight
         self.evt_nr[0]    = event[0].Number
         self.scale[0]     = event[0].Scale
-        self.scalePDF[0]  = event[0].ScalePDF
-        self.pdf1[0]      = event[0].PDF1
-        self.pdf2[0]      = event[0].PDF2
+        if not self.prune:
+            self.scalePDF[0]  = event[0].ScalePDF
+            self.pdf1[0]      = event[0].PDF1
+            self.pdf2[0]      = event[0].PDF2
         self.x1[0]        = event[0].X1
         self.x2[0]        = event[0].X2
         self.id1[0]       = event[0].ID1
         self.id2[0]       = event[0].ID2
         self.alphaQED[0]  = event[0].AlphaQED
         self.alphaQCD[0]  = event[0].AlphaQCD
-        self.pid[0]       = event[0].ProcessID
+        if not self.prune:
+            self.pid[0]       = event[0].ProcessID
 
         if not self.prune:
             for item in weights:
@@ -319,7 +328,11 @@ class TreeProducer:
         eliminate = []
         if self.prune:
             for idx, item in enumerate(particles):
-                if item.M1 >= 0 and particles[item.M1].M1 < 0 and item.D1 == -1 and item.D2 == -1:
+                if item.D1 == -1 and item.D2 == -1 and ( # final state
+                    (item.M1 >= 0 and particles[item.M1].M1 < 0) or # straight from proton
+                    (item.Status != 1) or # unstable
+                    (abs(item.PID) not in [ 1, 2, 3, 4, 5, 11, 12, 13, 14, 15, 16 ]) # keep only leptons and quarks
+                ):
                     eliminate.append(idx)
 
         i = 0
@@ -332,7 +345,7 @@ class TreeProducer:
                 self.genpart_phi    [i] = item.Phi
                 self.genpart_mass   [i] = item.Mass
                 self.genpart_m1     [i] = self.shifIdx(item.M1, eliminate)
-                self.genpart_m2     [i] = self.shifIdx(item.M2, eliminate)
+                #self.genpart_m2     [i] = self.shifIdx(item.M2, eliminate)
                 self.genpart_d1     [i] = self.shifIdx(item.D1, eliminate)
                 self.genpart_d2     [i] = self.shifIdx(item.D2, eliminate)
                 i += 1
@@ -346,13 +359,14 @@ class TreeProducer:
             self.genjet_eta      [i] = item.Eta
             self.genjet_phi      [i] = item.Phi
             self.genjet_mass     [i] = item.Mass
-            self.genjet_deltaEta [i] = item.DeltaEta
-            self.genjet_deltaPhi [i] = item.DeltaPhi
-            self.genjet_charge   [i] = item.Charge
-            self.genjet_nCharged [i] = item.NCharged
-            self.genjet_nNeutral [i] = item.NNeutrals
-            self.genjet_nef      [i] = item.NeutralEnergyFraction
-            self.genjet_cef      [i] = item.ChargedEnergyFraction
+            if not self.prune:
+                self.genjet_deltaEta [i] = item.DeltaEta
+                self.genjet_deltaPhi [i] = item.DeltaPhi
+                self.genjet_charge   [i] = item.Charge
+                self.genjet_nCharged [i] = item.NCharged
+                self.genjet_nNeutral [i] = item.NNeutrals
+                self.genjet_nef      [i] = item.NeutralEnergyFraction
+                self.genjet_cef      [i] = item.ChargedEnergyFraction
             i += 1
         self.genjet_size[0] = i
 
@@ -435,14 +449,15 @@ class TreeProducer:
             self.jet_eta       [i] = jetp4.Eta()
             self.jet_phi       [i] = jetp4.Phi()
             self.jet_mass      [i] = jetp4.M()
-            self.jet_deltaEta  [i] = item.DeltaEta
-            self.jet_deltaPhi  [i] = item.DeltaPhi
-            self.jet_charge    [i] = item.Charge
-            self.jet_hoe       [i] = item.EhadOverEem
-            self.jet_nCharged  [i] = item.NCharged
-            self.jet_nNeutral  [i] = item.NNeutrals
-            self.jet_nef       [i] = item.NeutralEnergyFraction
-            self.jet_cef       [i] = item.ChargedEnergyFraction
+            if not self.prune:
+                self.jet_deltaEta  [i] = item.DeltaEta
+                self.jet_deltaPhi  [i] = item.DeltaPhi
+                self.jet_charge    [i] = item.Charge
+                self.jet_hoe       [i] = item.EhadOverEem
+                self.jet_nCharged  [i] = item.NCharged
+                self.jet_nNeutral  [i] = item.NNeutrals
+                self.jet_nef       [i] = item.NeutralEnergyFraction
+                self.jet_cef       [i] = item.ChargedEnergyFraction
             # https://github.com/cms-sw/cmssw/blob/master/PhysicsTools/JetMCAlgos/plugins/JetPartonMatcher.cc
             self.jet_btag      [i] = item.BTag
             self.jet_btagAlgo  [i] = item.BTagAlgo
