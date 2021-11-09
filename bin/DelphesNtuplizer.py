@@ -12,15 +12,16 @@ import argparse
 
 
 class TreeProducer:
-    def __init__(self, pileup, debug):
+    def __init__(self, pileup, prune, debug):
 
          # flat tree branches
          self.debug = debug
+         self.prune = prune
 
          self.t = ROOT.TTree( "Events","Events" )
          self.maxn = 9999
 
-         if pileup:
+         if pileup and not self.prune:
              self.vtx_size         = array( 'i', [ 0 ] )
              self.vtx_ndf          = array( 'i', self.maxn*[0] )
              self.vtx_pt2          = array( 'f', self.maxn*[ 0. ] )
@@ -44,8 +45,9 @@ class TreeProducer:
          self.pid               = array( 'i', [ 0 ] )
          
          ## variation event weights (from "LHEEventProduct")
-         self.lheweight_size   = array( 'i', [ 0 ] )
-         self.lheweight_val    = array( 'f', self.maxn*[ 0 ] )
+         if not self.prune:
+             self.lheweight_size   = array( 'i', [ 0 ] )
+             self.lheweight_val    = array( 'f', self.maxn*[ 0 ] )
 
          self.genpart_size     = array( 'i', [ 0 ] )
          self.genpart_pid      = array( 'i', self.maxn*[ 0 ] )
@@ -75,17 +77,18 @@ class TreeProducer:
          self.genmet_pt        = array( 'f', [ 0. ] )
          self.genmet_phi       = array( 'f', [ 0. ] )
 
-         self.gamma_size       = array( 'i', [ 0 ] )
-         self.gamma_pt         = array( 'f', self.maxn*[ 0. ] )
-         self.gamma_eta        = array( 'f', self.maxn*[ 0. ] )
-         self.gamma_phi        = array( 'f', self.maxn*[ 0. ] )
-         self.gamma_mass       = array( 'f', self.maxn*[ 0. ] )
-         self.gamma_reliso     = array( 'f', self.maxn*[ 0. ] )
-         self.gamma_relisoRC   = array( 'f', self.maxn*[ 0. ] )
-         self.gamma_sumPtCh    = array( 'f', self.maxn*[ 0. ] )
-         self.gamma_sumPtNeu   = array( 'f', self.maxn*[ 0. ] )
-         self.gamma_sumPtCPU   = array( 'f', self.maxn*[ 0. ] )
-         self.gamma_sumPt      = array( 'f', self.maxn*[ 0. ] )
+         if not self.prune:
+             self.gamma_size       = array( 'i', [ 0 ] )
+             self.gamma_pt         = array( 'f', self.maxn*[ 0. ] )
+             self.gamma_eta        = array( 'f', self.maxn*[ 0. ] )
+             self.gamma_phi        = array( 'f', self.maxn*[ 0. ] )
+             self.gamma_mass       = array( 'f', self.maxn*[ 0. ] )
+             self.gamma_reliso     = array( 'f', self.maxn*[ 0. ] )
+             self.gamma_relisoRC   = array( 'f', self.maxn*[ 0. ] )
+             self.gamma_sumPtCh    = array( 'f', self.maxn*[ 0. ] )
+             self.gamma_sumPtNeu   = array( 'f', self.maxn*[ 0. ] )
+             self.gamma_sumPtCPU   = array( 'f', self.maxn*[ 0. ] )
+             self.gamma_sumPt      = array( 'f', self.maxn*[ 0. ] )
 
          self.elec_size        = array( 'i', [ 0 ] )
          self.elec_pt          = array( 'f', self.maxn*[ 0. ] )
@@ -135,7 +138,7 @@ class TreeProducer:
          self.jet_flavorAlgo   = array( 'i', self.maxn*[ 0 ] )
          self.jet_flavorPhys   = array( 'i', self.maxn*[ 0 ] )
 
-         if pileup:
+         if pileup and not self.prune:
              self.rho_size         = array( 'i', [ 0 ] )
              self.rho              = array( 'f', self.maxn*[ 0. ] )
 
@@ -157,10 +160,11 @@ class TreeProducer:
          self.t.Branch( "PID", self.pid, "PID/I")
          
          self.t.Branch( "genweight", self.genweight, "genweight/F")
-         self.t.Branch( "nLHEWeight", self.lheweight_size, "nLHEWeight/I")
-         self.t.Branch( "LHEWeight", self. lheweight_val, "LHEWeight[nLHEWeight]/I")
+         if not self.prune:
+             self.t.Branch( "nLHEWeight", self.lheweight_size, "nLHEWeight/I")
+             self.t.Branch( "LHEWeight", self. lheweight_val, "LHEWeight[nLHEWeight]/I")
 
-         if pileup:
+         if pileup and not self.prune:
              self.t.Branch( "nVertex", self.vtx_size, "nVertex/I")
              self.t.Branch( "Vertex_ndf", self.vtx_ndf, "Vertex_ndf[nVertex]/I")
              self.t.Branch( "Vertex_pt2", self.vtx_pt2, "Vertex_pt2[nVertex]/F")
@@ -197,17 +201,18 @@ class TreeProducer:
          self.t.Branch( "GenMET_pt", self.genmet_pt, "GenMET_pt/F")
          self.t.Branch( "GenMET_phi", self.genmet_phi, "GenMET_phi/F")
 
-         self.t.Branch( "nPhoton", self.gamma_size, "nPhoton/I")
-         self.t.Branch( "Photon_pt", self.gamma_pt, "Photon_pt[nPhoton]/F")
-         self.t.Branch( "Photon_eta", self.gamma_eta, "Photon_eta[nPhoton]/F")
-         self.t.Branch( "Photon_phi", self.gamma_phi, "Photon_phi[nPhoton]/F")
-         self.t.Branch( "Photon_mass", self.gamma_mass, "Photon_mass[nPhoton]/F")
-         self.t.Branch( "Photon_relIso", self.gamma_reliso, "Photon_relIso[nPhoton]/F")
-         self.t.Branch( "Photon_relIsoRhoCorr", self.gamma_relisoRC, "Photon_relIsoRhoCorr[nPhoton]/F")
-         self.t.Branch( "Photon_sumPt", self.gamma_sumPt, "Photon_sumPt[nPhoton]/F")
-         self.t.Branch( "Photon_sumPtCh", self.gamma_sumPtCh, "Photon_sumPtCh[nPhoton]/F")
-         self.t.Branch( "Photon_sumPtNeu", self.gamma_sumPtNeu, "Photon_sumPtNeu[nPhoton]/F")
-         self.t.Branch( "Photon_sumPtCPU", self.gamma_sumPtCPU, "Photon_sumPtCPU[nPhoton]/F")
+         if not self.prune:
+             self.t.Branch( "nPhoton", self.gamma_size, "nPhoton/I")
+             self.t.Branch( "Photon_pt", self.gamma_pt, "Photon_pt[nPhoton]/F")
+             self.t.Branch( "Photon_eta", self.gamma_eta, "Photon_eta[nPhoton]/F")
+             self.t.Branch( "Photon_phi", self.gamma_phi, "Photon_phi[nPhoton]/F")
+             self.t.Branch( "Photon_mass", self.gamma_mass, "Photon_mass[nPhoton]/F")
+             self.t.Branch( "Photon_relIso", self.gamma_reliso, "Photon_relIso[nPhoton]/F")
+             self.t.Branch( "Photon_relIsoRhoCorr", self.gamma_relisoRC, "Photon_relIsoRhoCorr[nPhoton]/F")
+             self.t.Branch( "Photon_sumPt", self.gamma_sumPt, "Photon_sumPt[nPhoton]/F")
+             self.t.Branch( "Photon_sumPtCh", self.gamma_sumPtCh, "Photon_sumPtCh[nPhoton]/F")
+             self.t.Branch( "Photon_sumPtNeu", self.gamma_sumPtNeu, "Photon_sumPtNeu[nPhoton]/F")
+             self.t.Branch( "Photon_sumPtCPU", self.gamma_sumPtCPU, "Photon_sumPtCPU[nPhoton]/F")
 
          self.t.Branch( "nElectron", self.elec_size, "nElectron/I")
          self.t.Branch( "Electron_pt", self.elec_pt, "Electron_pt[nElectron]/F")
@@ -257,7 +262,7 @@ class TreeProducer:
          self.t.Branch( "Jet_flavorAlgo", self.jet_flavorAlgo, "Jet_flavorAlgo[nJet]/I")
          self.t.Branch( "Jet_flavorPhys", self.jet_flavorPhys, "Jet_flavorPhys[nJet]/I")
 
-         if pileup:
+         if pileup and not self.prune:
              self.t.Branch( "nRho", self.rho_size, "nRho/I")
              self.t.Branch( "Rho", self.rho, "Rho[nRho]/F")
 
@@ -295,27 +300,42 @@ class TreeProducer:
         self.alphaQCD[0]  = event[0].AlphaQCD
         self.pid[0]       = event[0].ProcessID
 
-        for item in weights:
-            self.lheweight_val[i] = item.Weight
-            i += 1
-        self.lheweight_size[0] = i
+        if not self.prune:
+            for item in weights:
+                self.lheweight_val[i] = item.Weight
+                i += 1
+            self.lheweight_size[0] = i
 
 
     #___________________________________________
+    def shifIdx(self, idx, eliminate):
+        if idx < 0 or not eliminate:
+            return idx
+        shift = len([ i for i in eliminate if i < idx ])
+        assert(shift <= idx)
+        return idx - shift
+
     def processGenParticles(self, particles):
+        eliminate = []
+        if self.prune:
+            for idx, item in enumerate(particles):
+                if item.M1 >= 0 and particles[item.M1].M1 < 0 and item.D1 == -1 and item.D2 == -1:
+                    eliminate.append(idx)
+
         i = 0
-        for item in particles:
-            self.genpart_pid    [i] = item.PID
-            self.genpart_status [i] = item.Status
-            self.genpart_pt     [i] = item.PT
-            self.genpart_eta    [i] = item.Eta
-            self.genpart_phi    [i] = item.Phi
-            self.genpart_mass   [i] = item.Mass
-            self.genpart_m1     [i] = item.M1
-            self.genpart_m2     [i] = item.M2
-            self.genpart_d1     [i] = item.D1
-            self.genpart_d2     [i] = item.D2
-            i += 1
+        for j, item in enumerate(particles):
+            if j not in eliminate:
+                self.genpart_pid    [i] = item.PID
+                self.genpart_status [i] = item.Status
+                self.genpart_pt     [i] = item.PT
+                self.genpart_eta    [i] = item.Eta
+                self.genpart_phi    [i] = item.Phi
+                self.genpart_mass   [i] = item.Mass
+                self.genpart_m1     [i] = self.shifIdx(item.M1, eliminate)
+                self.genpart_m2     [i] = self.shifIdx(item.M2, eliminate)
+                self.genpart_d1     [i] = self.shifIdx(item.D1, eliminate)
+                self.genpart_d2     [i] = self.shifIdx(item.D2, eliminate)
+                i += 1
         self.genpart_size[0] = i
 
     #___________________________________________
@@ -480,6 +500,7 @@ def main():
     parser.add_argument ('-n', '--nev', help='number of events', type=int, default=-1)
     parser.add_argument ('-d', '--debug', help='debug flag',  action='store_true',  default=False)
     parser.add_argument ('-p', '--pileup', help='input built with PU', type=bool_type, default=True)
+    parser.add_argument ('-P', '--prune', help='prune', type=bool_type, default=True)
 
     args = parser.parse_args()
 
@@ -488,6 +509,7 @@ def main():
     nevents = args.nev
     debug = args.debug
     pileup = args.pileup
+    prune = args.prune
 
     chain = ROOT.TChain("Delphes")
     chain.Add(inputFile)
@@ -502,20 +524,21 @@ def main():
 
     branchEvent           = treeReader.UseBranch('Event')   
     branchWeight          = treeReader.UseBranch('Weight')   
-    if pileup:
+    if pileup and not prune:
         branchVertex          = treeReader.UseBranch('Vertex')
     branchParticle        = treeReader.UseBranch('Particle') 
     branchGenJet          = treeReader.UseBranch('GenJet')   
-    branchGenMissingET    = treeReader.UseBranch('GenMissingET')   
-    branchPhoton          = treeReader.UseBranch('Photon')
+    branchGenMissingET    = treeReader.UseBranch('GenMissingET')
+    if not prune:
+        branchPhoton          = treeReader.UseBranch('Photon')
     branchElectron        = treeReader.UseBranch('Electron')
     branchMuon            = treeReader.UseBranch('Muon')
     branchCHSJet          = treeReader.UseBranch('Jet')
     branchMissingET       = treeReader.UseBranch('MissingET')
-    if pileup:
+    if pileup and not prune:
         branchRho             = treeReader.UseBranch('Rho')
 
-    treeProducer = TreeProducer(pileup, debug)
+    treeProducer = TreeProducer(pileup, prune, debug)
 
     if nevents > 0:
         numberOfEntries = nevents
@@ -530,17 +553,18 @@ def main():
             print(' ... processed {} events ...'.format(entry+1))
 
         treeProducer.processEvent(branchEvent, branchWeight)
-        if pileup:
+        if pileup and not prune:
             treeProducer.processVertices(branchVertex)
         treeProducer.processGenParticles(branchParticle)
         treeProducer.processGenJets(branchGenJet)
         treeProducer.processGenMissingET(branchGenMissingET)
         treeProducer.processElectrons(branchElectron)
         treeProducer.processMuons(branchMuon)
-        treeProducer.processPhotons(branchPhoton)
+        if not prune:
+            treeProducer.processPhotons(branchPhoton)
         treeProducer.processMissingET(branchMissingET)
         treeProducer.processCHSJets(branchCHSJet)
-        if pileup:
+        if pileup and not prune:
             treeProducer.processRho(branchRho)
 
         ## fill tree 
